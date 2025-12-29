@@ -1,0 +1,32 @@
+import mongoose from "mongoose";
+
+const batchSchema = new mongoose.Schema(
+    {
+        name:{
+            type:String,
+            required:true,
+        },
+        class:{
+            type:String,
+            required:true,
+        },
+        group:{
+            type:Number,
+            default:1,
+        },
+        owner:{
+            type:mongoose.Schema.Types.ObjectId,
+            ref:"User"
+        },
+        students:[
+            {
+                type:mongoose.Schema.Types.ObjectId,
+                ref:"Students",
+            },
+        ]
+    }
+)
+
+const Batch = mongoose.model("Batch",batchSchema)
+
+export default Batch;
