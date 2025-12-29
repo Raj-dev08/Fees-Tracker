@@ -10,6 +10,9 @@ import { protectRoute } from "./middleware/auth.middleware.js";
 
 import authRoutes from "./routes/auth.routes.js";
 import batchRoutes from "./routes/batch.routes.js";
+import studentRoutes from './routes/student.routes.js'
+import feesRoutes from './routes/fees.routes.js'
+
 
 
 const app = express()
@@ -34,6 +37,9 @@ app.use(
 
 app.use("/api/auth", authRoutes);
 app.use("/api/batch", protectRoute, batchRoutes);
+app.use("/api/student", protectRoute, studentRoutes);
+app.use("/api/fees", protectRoute, feesRoutes);
+
 
 
 app.use(errorHandler)
