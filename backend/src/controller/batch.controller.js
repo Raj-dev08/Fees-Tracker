@@ -4,10 +4,14 @@ import User from "../model/user.model.js";
 export const createBatch = async (req, res, next) => {
   try {
     const { user } = req;
-    const { name, className, group } = req.body;
+    const { name, className, group , fees } = req.body;
 
-    if (!name || !className || !group) {
+    if (!name || !className || !group || !fees) {
       return res.status(400).json({ message: "name ,class and group are required" });
+    }
+
+    if( fees < 0 || group < 0 ){
+      return res.status(400).json({ message: "fees and group cannot be negative" });
     }
 
     const batch = await Batch.create({
@@ -15,6 +19,7 @@ export const createBatch = async (req, res, next) => {
       class: className,
       group,
       owner: user._id,
+      fees
     });
 
     await User.findByIdAndUpdate(user._id, {
@@ -74,12 +79,12 @@ export const updateBatch = async (req, res, next) => {
   try {
     const { user } = req;
     const { id } = req.params;
-    const { name, className, group } = req.body;
+    const { name, className, group , fees } = req.body;
 
     if(!id){
         return res.status(400).json({ message: "Id is required" });
     }
-    if (!name && !className && !group ) {
+    if (!name && !className && !group && !fees ) {
         return res.status(400).json({ message: "name ,class, id and group are required"})
     }
 
@@ -102,7 +107,15 @@ export const updateBatch = async (req, res, next) => {
     }
 
     if(group){
+      if(group > 0 ){
         batch.group = group;
+      }   
+    }
+
+    if(fees){
+      if(fees > 0 ){
+        batch.fees = fees;
+      }   
     }
 
     await batch.save();

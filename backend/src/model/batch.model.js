@@ -18,10 +18,15 @@ const batchSchema = new mongoose.Schema(
             type:mongoose.Schema.Types.ObjectId,
             ref:"User"
         },
+        fees:{
+            type: Number,
+            default:0,
+            required: true
+        },
         students:[
             {
                 type:mongoose.Schema.Types.ObjectId,
-                ref:"Students",
+                ref:"Student",
             },
         ]
     }

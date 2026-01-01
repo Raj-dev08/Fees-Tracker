@@ -19,6 +19,15 @@ const studentSchema = new mongoose.Schema(
             enum:["January","February","March","April","May","June","July","August","September","October","November","December"],
             required:true,
         },
+        admissionYear:{
+            type:Number,
+            required:true,
+        },
+        batch:{
+            type:mongoose.Schema.Types.ObjectId,
+            ref:"Batch",
+            required:true,
+        },
         fees:[
             {
                 type:mongoose.Schema.Types.ObjectId,
