@@ -1,6 +1,5 @@
 import Student from "../model/student.model.js";
 import Fees from "../model/fees.model.js";
-import { redis } from "../lib/redis.js";
 
 const monthMap = {
     "January":0,
@@ -38,11 +37,6 @@ export const addFees = async (req, res, next) => {
 
         if( typeof forYear !== "number" || forYear < 2025  ){
             return res.status(400).json({ message: "Invalid year"})
-        }
-
-        const cacheKey = `student:${studentId}:fees:${forMonth}:${forYear}`;
-        if (await redis.exists(cacheKey)) {
-            return res.status(409).json({ message: "Fees already added" });
         }
 
         const student = await Student.findById(studentId).populate("batch");
@@ -91,8 +85,6 @@ export const addFees = async (req, res, next) => {
         student.lastFeesPaidFor = forMonth
         student.lastFeesPaidForYear = forYear
         await student.save();
-
-        await redis.set(cacheKey,"1", "EX" , 60 * 60 * 24 * 28)
 
         return res.status(201).json({ fees });
     } catch (error) {
