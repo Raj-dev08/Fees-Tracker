@@ -59,6 +59,7 @@ export const useSignup = () => {
   });
 };
 
+//not really needed for now so not in use
 export const useLogout = () => {
   const qc = useQueryClient();
 

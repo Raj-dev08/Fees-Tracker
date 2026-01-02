@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import Student from "../model/student.model.js";
 import Batch from "../model/batch.model.js";
+import Fees from "../model/fees.model.js";
+
 
 export const addStudent = async (req, res, next) => {
   try {
@@ -9,6 +11,7 @@ export const addStudent = async (req, res, next) => {
       name,
       mobileNumber,
       lastFeesPaidFor,
+      lastFeesPaidForYear,
       admissionMonth,
       admissionYear,
       batchId,
@@ -17,6 +20,7 @@ export const addStudent = async (req, res, next) => {
     if (
       !name ||
       !lastFeesPaidFor ||
+      !lastFeesPaidForYear ||
       !admissionMonth ||
       !admissionYear ||
       !batchId
@@ -38,14 +42,30 @@ export const addStudent = async (req, res, next) => {
       return res.status(401).json({ message: "Unauthorized access" });
     }
 
+    if( typeof admissionYear !== "number" || admissionYear < 2020  || lastFeesPaidForYear < 2020 || typeof lastFeesPaidForYear !== "number"){
+        return res.status(400).json({ message: "Invalid year"})
+    }
+
+
+
     const student = await Student.create({
       name,
       mobileNumber,
       lastFeesPaidFor,
+      lastFeesPaidForYear,
       admissionMonth,
       admissionYear,
       batch: batch._id,
     });
+
+    const fees = await Fees.create({
+      forMonth: lastFeesPaidFor,
+      forYear: lastFeesPaidForYear,
+      studentId: student._id
+    });
+
+    student.fees.push(fees._id)
+    await student.save();
 
     batch.students.push(student._id);
     await batch.save();
@@ -114,4 +134,25 @@ export const getStudentById = async (req, res, next) => {
     } catch (error) {
         next(error)
     }
+}
+
+export const searchStudent = async (req, res, next) => {
+  try {
+    const { user } = req;
+    const { name } = req.query;
+
+    if(!name){
+      return res.status(400).json({ message: "Missing required fields"})
+    }
+
+    let students = await Student.find({
+      name: { $regex: name, $options: "i" },
+    }).populate("batch");
+
+    students = students.filter((student) => student.batch.owner.toString() === user._id.toString());
+
+    return res.status(200).json({ students });
+  } catch (error) {
+    next(error)
+  }
 }

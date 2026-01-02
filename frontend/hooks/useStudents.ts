@@ -10,7 +10,8 @@ export type Student = {
   name: string;
   mobileNumber?: string;
   lastFeesPaidFor?: string;
-  admissionMonth?: number;
+  lastFeesPaidForYear?: number;
+  admissionMonth?: string;
   admissionYear?: number;
   batch: any;
   fees?: any[];
@@ -19,7 +20,6 @@ export type Student = {
 };
 
 
-// Fetch a single student by ID
 export const useStudentById = (studentId: string) => {
   return useQuery<{ student: Student }, AxiosError>({
     queryKey: ["student", studentId],
@@ -31,7 +31,17 @@ export const useStudentById = (studentId: string) => {
   });
 };
 
-// Add a new student
+export const useSearchStudents = (search: string) => {
+  return useQuery<{ students: Student[] }, AxiosError>({
+    queryKey: ["students", search],
+    queryFn: async () => {
+      const res = await api.get(`/student/search?name=${search}`);
+      return res.data;
+    },
+      enabled: !!search,
+  });
+}
+
 export const useAddStudent = () => {
   const qc = useQueryClient();
   return useMutation({
@@ -39,10 +49,11 @@ export const useAddStudent = () => {
       name: string;
       mobileNumber?: string;
       lastFeesPaidFor: string;
+      lastFeesPaidForYear: number;
       admissionMonth: string;
       admissionYear: number;
       batchId: string;
-    }) => api.post("/student/add-student", data),
+    }) => api.post("/student/add-student", data).then(res => res.data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["students"] });
       qc.invalidateQueries({ queryKey: ["batches"] });
@@ -54,7 +65,6 @@ export const useAddStudent = () => {
   });
 };
 
-// Remove a student
 export const useRemoveStudent = () => {
   const qc = useQueryClient();
   return useMutation({
@@ -70,3 +80,36 @@ export const useRemoveStudent = () => {
   });
 };
 
+export const useCreateBill = (studentId: string) => {
+  const qc = useQueryClient();
+
+  return useMutation<
+    any,
+    AxiosError,
+    { forMonth: string; forYear: number }
+  >({
+    mutationFn: async (data) => {
+      const res = await api.post(
+        `/fees/add-fees/${studentId}`,
+        data
+      );
+      return res.data;
+    },
+
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["student", studentId] });
+      qc.invalidateQueries({ queryKey: ["students"] });
+      qc.invalidateQueries({ queryKey: ["batches"] });
+
+      toast.success("Fees added successfully");
+    },
+
+    onError: (err: any) => {
+      toast.error(
+        err.response?.data?.message ||
+          err.message ||
+          "Failed to add fees"
+      );
+    },
+  });
+};

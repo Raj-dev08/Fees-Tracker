@@ -2,10 +2,6 @@ import mongoose from "mongoose";
 
 const feesSchema = new mongoose.Schema(
     {
-        amount:{
-            type:Number,
-            required:true,
-        },
         forMonth:{
             type:String,
             enum:["January","February","March","April","May","June","July","August","September","October","November","December"],

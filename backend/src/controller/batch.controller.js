@@ -59,7 +59,7 @@ export const getBatchById = async (req, res, next) => {
         return res.status(400).json({ message: "Id is required" });
     }
 
-    const batch = await Batch.findById(id).populate("students", "name mobileNumber admissionYear admissionMonth lastFeesPaidFor");
+    const batch = await Batch.findById(id).populate("students");
 
 
     if (!batch) {

@@ -3,15 +3,18 @@
 import { useState, useMemo } from "react";
 import { useMyBatch, Batch, useDeleteBatch } from "@/hooks/useBatch";
 import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
+import { Search } from "lucide-react";
 
 export default function LandingPage() {
   const router = useRouter();
   const { data, isLoading, error } = useMyBatch();
   const deleteBatchMutation = useDeleteBatch();
+  
 
   // State for filter
   const [selectedClass, setSelectedClass] = useState<string | "All">("All");
+  const [search, setSearch] = useState("");
+
 
   // Get unique classes for filter dropdown
   const classes = useMemo(() => {
@@ -20,7 +23,7 @@ export default function LandingPage() {
   }, [data?.batches]);
 
   // Filtered batches
-  const filteredBatches = useMemo(() => {
+  let filteredBatches = useMemo(() => {
     if (!data?.batches) return [];
     if (selectedClass === "All") return data.batches;
     return data.batches.filter((b) => b.class === selectedClass);
@@ -32,28 +35,50 @@ export default function LandingPage() {
     }
   };
 
+  filteredBatches = filteredBatches.filter((batch) =>
+    batch.name.toLowerCase().includes(search.toLowerCase())
+  )
+
   return (
     <main className="min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-black text-white p-6 relative">
       {/* Header */}
-      <header className="max-w-6xl mx-auto flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold tracking-tight">FeesTracker</h1>
+      <header className="max-w-6xl mx-auto ">
+        <div className="flex justify-between items-center mb-6 sm:flex-row flex-col space-y-3">
+        <h1 className="text-2xl font-bold tracking-tight flex-1">FeesTracker</h1>
+        
+        <div className="flex justify-between gap-6 my-2">
 
-        {/* Class Filter */}
-        {classes.length > 0 && (
-          <select
-            value={selectedClass}
-            onChange={(e) => setSelectedClass(e.target.value)}
-            className="rounded-lg bg-black/40 border border-white/20 px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-white/30 transition"
-          >
-            <option value="All">All Classes</option>
-            {classes.map((cls) => (
-              <option key={cls} value={cls}>
-                {cls}
-              </option>
-            ))}
-          </select>
-        )}
+          <button className="flex gap-2 items-center bg-black/40 border border-white/20 px-3 py-2 text-white rounded-md" onClick={()=> router.push('/students/search')}>
+            <Search/>Students
+          </button>
+          {/* Class Filter */}
+          {classes.length > 0 && (
+            <select
+              value={selectedClass}
+              onChange={(e) => setSelectedClass(e.target.value)}
+              className="rounded-lg bg-black/40 border border-white/20 px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-white/30 transition"
+            >
+              <option value="All">All Classes</option>
+              {classes.map((cls) => (
+                <option key={cls} value={cls}>
+                  {cls}
+                </option>
+              ))}
+            </select>
+          )}
+
+          </div>
+        </div>
+
+         <input
+          type="text"
+          placeholder="Search by Batch name"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          className="w-full mx-auto mt-4 px-3 py-2 mb-4 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/30"
+        />
       </header>
+     
 
       {/* Batches Grid */}
       <section className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">

@@ -2,6 +2,21 @@ import Student from "../model/student.model.js";
 import Fees from "../model/fees.model.js";
 import { redis } from "../lib/redis.js";
 
+const monthMap = {
+    "January":0,
+    "February":1,
+    "March":2,
+    "April":3,
+    "May":4,
+    "June":5,
+    "July":6,
+    "August":7,
+    "September":8,
+    "October":9,
+    "November":10,
+    "December":11,
+  }
+
 export const addFees = async (req, res, next) => {
     try {
         const { user } = req;
@@ -11,6 +26,7 @@ export const addFees = async (req, res, next) => {
         if(!studentId){
             return res.status(400).json({ message: "Student id is required"})
         }
+        
 
         if( !forMonth || !forYear){
             return res.status(400).json({ message: "All fields are required"})
@@ -39,6 +55,19 @@ export const addFees = async (req, res, next) => {
             return res.status(401).json({ message: "Unauthorized access"})
         }
 
+        const lastIndex =
+        student.lastFeesPaidForYear * 12 + monthMap[student.lastFeesPaidFor];
+        const newIndex =
+        forYear * 12 + monthMap[forMonth];
+
+        if (newIndex <= lastIndex) {
+            return res.status(409).json({ message: "Fees already paid" });
+        }
+
+        if (newIndex !== lastIndex + 1) {
+            return res.status(400).json({ message: "Clear previous month fees first" });
+        }
+
         
 
         const alreadyPaid = await Fees.findOne({
@@ -60,9 +89,10 @@ export const addFees = async (req, res, next) => {
 
         student.fees.push(fees._id);
         student.lastFeesPaidFor = forMonth
+        student.lastFeesPaidForYear = forYear
         await student.save();
 
-        await redis.set(cacheKey,"1", "EX" , 60 * 60 * 24 * 30)
+        await redis.set(cacheKey,"1", "EX" , 60 * 60 * 24 * 28)
 
         return res.status(201).json({ fees });
     } catch (error) {

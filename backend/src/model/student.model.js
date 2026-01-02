@@ -14,6 +14,10 @@ const studentSchema = new mongoose.Schema(
             enum:["January","February","March","April","May","June","July","August","September","October","November","December"],
             required:true,
         },
+        lastFeesPaidForYear:{
+            type:Number,
+            required:true,
+        },
         admissionMonth:{
             type:String,
             enum:["January","February","March","April","May","June","July","August","September","October","November","December"],
