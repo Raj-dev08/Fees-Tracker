@@ -36,10 +36,14 @@ export const signup = async (req, res,next) => {
 
         const savedUser = await newUser.save();
 
+        const token = generateToken(savedUser._id, res);
+
+
         return res.status(201).json({
             _id: savedUser._id,
             name: savedUser.name,
             email: savedUser.email,
+            token
         });
         } catch (error) {
           next(error);
@@ -65,12 +69,13 @@ export const login = async (req, res,next) => {
         }
 
 
-        generateToken(user._id, res);
+        const token = generateToken(user._id, res);
         
         res.status(200).json({
             _id: user._id,
             name: user.name,
             email: user.email,
+            token: token,
         });
     } catch (error) {
         next(error);

@@ -32,7 +32,6 @@ export default function CreateBatchPage() {
 
     createBatchMutation.mutate(form, {
       onSuccess: () => {
-        toast.success("Batch created successfully!");
         setForm({ name: "", className: "", group: 1, fees: 0 });
         setTimeout(() => router.replace("/"), 800);
       },
@@ -70,7 +69,7 @@ export default function CreateBatchPage() {
           {/* Labels on top */}
           <div className="flex flex-col">
             <label htmlFor="batchName" className="text-white/70 mb-1 text-sm">
-              Batch Name
+              Batch Name*
             </label>
             <input
               id="batchName"
@@ -85,7 +84,7 @@ export default function CreateBatchPage() {
 
           <div className="flex flex-col">
             <label htmlFor="className" className="text-white/70 mb-1 text-sm">
-              Class Name
+              Class Name*
             </label>
             <input
               id="className"
@@ -117,7 +116,7 @@ export default function CreateBatchPage() {
 
           <div className="flex flex-col">
             <label htmlFor="fees" className="text-white/70 mb-1 text-sm">
-              Fees
+              Fees*
             </label>
             <input
               id="fees"

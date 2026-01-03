@@ -17,15 +17,6 @@ export type Batch = {
   updatedAt?: string;
 };
 
-export const useBatches = () => {
-  return useQuery<{ batches: Batch[] }, AxiosError>({
-    queryKey: ["batches"],
-    queryFn: async () => {
-      const res = await api.get("/batch");
-      return res.data;
-    },
-  });
-};
 
 export const useCreateBatch = () => {
   const qc = useQueryClient();
@@ -84,7 +75,7 @@ export const useBatchById = (id: string) => {
 
 export const useMyBatch = () => {
     return useQuery<{ batches: Batch[] }, AxiosError>({
-      queryKey: ["my-batches"],
+      queryKey: ["batches"],
       queryFn: async () => {
         const res = await api.get("/batch");
         return res.data;

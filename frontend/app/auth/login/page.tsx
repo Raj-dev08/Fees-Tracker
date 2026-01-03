@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useLogin } from "@/hooks/useAuth";
+import { useLogin , useAuth } from "@/hooks/useAuth";
 import { Toaster } from "react-hot-toast";
 
 export default function LoginPage() {
@@ -12,17 +12,22 @@ export default function LoginPage() {
 
   const { mutate: login, isPending, error } = useLogin();
 
+  const { data: user, isLoading } = useAuth();
+
+  useEffect(() => {
+    if (!isLoading && user) {
+      router.replace("/");
+    }
+  }, [isLoading, user, router]);
+
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    login({ email, password }, {
-      onSuccess: () => {
-        setTimeout(() => router.replace("/"), 500); // slight delay for toast
-      },
-    });
+    login({ email, password})
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-black text-white flex items-center justify-center px-4">
+    <main className="min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-black text-white flex items-center justify-center px-4">
       <Toaster position="top-right" />
       <div className="w-full max-w-md">
         <h1 className="text-2xl font-semibold tracking-tight text-center">

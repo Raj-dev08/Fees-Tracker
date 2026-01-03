@@ -31,11 +31,12 @@ export const useLogin = () => {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: { email: string; password: string }) =>
-      api.post("/auth/login", data),
-    onSuccess: () => {
+    mutationFn: (data: { email: string; password: string }) => 
+      api.post("/auth/login", data)
+    ,
+    onSuccess: (res) => {
+      localStorage.setItem("token", res.data.token);
       qc.invalidateQueries({ queryKey: ["auth"] });
-      toast.success("Logged in successfully!");
     },
     onError: (err: AxiosError | any) => {
       toast.error(err.response?.data?.message || err.message || "Login failed");
@@ -49,9 +50,9 @@ export const useSignup = () => {
   return useMutation({
     mutationFn: (data: { name: string; email: string; password: string }) =>
       api.post("/auth/signup", data),
-    onSuccess: () => {
+    onSuccess: (res) => {
+      localStorage.setItem("token", res.data.token);
       qc.invalidateQueries({ queryKey: ["auth"] });
-      toast.success("Account created successfully!");
     },
     onError: (err: AxiosError | any) => {
       toast.error(err.response?.data?.message || err.message || "Signup failed");

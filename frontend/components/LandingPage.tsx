@@ -32,6 +32,8 @@ export default function LandingPage() {
   const handleDelete = (id: string) => {
     if (confirm("Are you sure you want to delete this batch?")) {
       deleteBatchMutation.mutate(id);
+
+      filteredBatches = filteredBatches.filter((batch) => batch._id !== id);
     }
   };
 

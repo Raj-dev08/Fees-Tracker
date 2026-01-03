@@ -1,34 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useSignup } from "@/hooks/useAuth";
+import { useSignup, useAuth } from "@/hooks/useAuth";
 import { Toaster } from "react-hot-toast";
 
 export default function SignupPage() {
   const router = useRouter();
   const [form, setForm] = useState({ name: "", email: "", password: "" });
 
-  const signupMutation = useSignup();
+  const { mutate: signupMutation , isPending} = useSignup();
+
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const { data: user, isLoading } = useAuth();
+
+  useEffect(() => {
+    if (!isLoading && user) {
+      router.replace("/");
+    }
+  }, [isLoading, user, router])
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    signupMutation.mutate(form, {
-      onSuccess: () => {
-        // Delay redirect so toast is visible
-        setTimeout(() => {
-          router.replace("/");
-        }, 800); // 0.8s delay
-      },
-    });
+    signupMutation(form);
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-black text-white flex items-center justify-center px-4">
+    <main className="min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-black text-white flex items-center justify-center px-4">
       <Toaster position="top-right" />
       <div className="w-full max-w-md">
         <h1 className="text-2xl font-semibold tracking-tight text-center">
@@ -72,10 +75,10 @@ export default function SignupPage() {
             />
             <button
               type="submit"
-              disabled={signupMutation.isPending}
+              disabled={isPending}
               className="w-full rounded-lg bg-white py-3 text-black font-medium hover:opacity-90 disabled:opacity-60"
             >
-              {signupMutation.isPending ? "Creating account..." : "Create account"}
+              {isPending ? "Creating account..." : "Create account"}
             </button>
           </form>
         </div>
