@@ -19,6 +19,11 @@ const feesSchema = new mongoose.Schema(
             type:mongoose.Schema.Types.ObjectId,
             ref:"Student",
             required:true,
+        },
+        batchId:{
+            type:mongoose.Schema.Types.ObjectId,
+            ref:"Batch",
+            required:true,
         }
     },{
         timestamps:true,

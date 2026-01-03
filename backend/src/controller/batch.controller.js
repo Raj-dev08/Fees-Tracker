@@ -1,4 +1,6 @@
 import Batch from "../model/batch.model.js";
+import Fees from "../model/fees.model.js";
+import Student from "../model/student.model.js";
 import User from "../model/user.model.js";
 
 export const createBatch = async (req, res, next) => {
@@ -139,6 +141,10 @@ export const deleteBatch = async (req, res, next) => {
     if (!batch) {
       return res.status(404).json({ message: "Batch not found" });
     }
+
+    await Student.deleteMany({ batch: batch._id });
+
+    await Fees.deleteMany({ batchId: batch._id });
 
     // remove from user.batches
     await User.findByIdAndUpdate(user._id, {

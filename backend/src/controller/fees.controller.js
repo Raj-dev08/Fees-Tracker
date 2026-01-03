@@ -45,6 +45,11 @@ export const addFees = async (req, res, next) => {
             return res.status(404).json({ message: "Student not found"})
         }
 
+        if(!student.batch){
+            return res.status(400).json({ message: "Student has no batch"})
+        }
+
+
         if(student.batch.owner.toString() !== user._id.toString()){
             return res.status(401).json({ message: "Unauthorized access"})
         }
@@ -68,6 +73,7 @@ export const addFees = async (req, res, next) => {
             studentId: student._id,
             forMonth,
             forYear,
+            batchId: student.batch._id
         })
 
         if(alreadyPaid){
