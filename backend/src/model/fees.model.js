@@ -11,10 +11,6 @@ const feesSchema = new mongoose.Schema(
             type:Number,
             required:true,
         },
-        entryDate:{
-            type:Date,
-            default:Date.now,
-        },
         studentId:{
             type:mongoose.Schema.Types.ObjectId,
             ref:"Student",

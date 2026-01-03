@@ -61,7 +61,8 @@ export const addStudent = async (req, res, next) => {
     const fees = await Fees.create({
       forMonth: lastFeesPaidFor,
       forYear: lastFeesPaidForYear,
-      studentId: student._id
+      studentId: student._id,
+      batchId: batch._id,
     });
 
     student.fees.push(fees._id)
